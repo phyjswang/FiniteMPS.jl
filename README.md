@@ -56,6 +56,10 @@ pkg> add "https://github.com/Qiaoyi-Li/FiniteMPS.jl.git"
      Threads.nthreads() * BLAS.get_num_threads()
      ```   
 
+For example, a minimal setup for multi-threading usage with MKL support is the following,
+```bash
+MKL_NUM_THREADS=2 julia -t 8
+```
 
 ### Local space
 The first step is to choose a local space, i.e. the local 1-site Hilbert space and some 1-site operators according to the model and symmetry used. We predefine some in folder `LocalSpace` and you can use the documentation to see which operators are provided in it, e.g 
@@ -102,13 +106,13 @@ Although the `FiniteMPS` package is written in an object-oriented style, a proce
 
 being the usually used building blocks.
 
-Note a trilayer tensor network (namely environment), e.g. $\langle \Psi|H|\Psi\rangle$ where $\ket{\Psi}$ the MPS and $H$ the hamiltonian MPO, instead of the state $\ket\Psi$, should be passed in. The following code will intialize a random MPS and then generate the environment.
+Note a trilayer tensor network (namely environment), e.g. $\langle \Psi|H|\Psi\rangle$ where $\ket{\Psi}$ the MPS and $H$ the hamiltonian MPO, instead of the state $\ket\Psi$, should be passed in. The following code will initialize a random MPS and then generate the environment.
 ```julia
 # initialize
 Ψ = randMPS(L, U₁Spin.pspace, Rep[U₁](i => 1 for i in -1:1//2:1))
 Env = Environment(Ψ', Ham, Ψ)
 ```
-More detailed usages of the above functions can be found in the documentation.\
+More detailed usages of the above functions can be found in the documentation.
 
 > [!NOTE] Note: 
 Symmetries may limit the choice of auxiliary space, e.g. the spin quantum number must be integers or half integers alternately along the sites for spin-1/2 systems as fusing the physical space will exactly shift quantum number by 1/2. If the auxiliary space (`Rep[U₁](i => 1 for i in -1:1//2:1)` here) is not chosen appropriately to be compatible with the symmetry, some errors will occur when generating the MPS or later.
