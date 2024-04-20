@@ -14,7 +14,7 @@ I write this package aim to study some heavy quantum many-body problems (e.g. hi
 ### Convenience
 
 - The MPS-level operations are separated with the lower tensor-level operations so modifying codes with different symmetries, lattices and models is quite simple.
-- We provide a hamiltonian generator via automata (like `OpSum` in [ITensors.jl](https://github.com/ITensor/ITensors.jl)) so that the interactions can be added in a simple and general way, details please see the workflow section.
+- We provide a hamiltonian generator via automata (like `OpSum` in [ITensors.jl](https://github.com/ITensor/ITensors.jl)) so that the interactions can be added in a simple and general way, details please see the tutorials.
 - We also provide some similar interfaces so that you can measure the  observales and correlations conveniently. Note these computations can also be multi-threaded.
   
 ### MPO supports
@@ -35,11 +35,11 @@ Now this package contains
 ### Installation
 To install this package, you can press "]" in REPL and type
 ```julia
-pkg> add "https://github.com/Qiaoyi-Li/FiniteMPS.jl.git"
+pkg> add FiniteMPS
 ```
 
 ### Multi-threading settings
-- Only multi-threading is stable in current version, please make sure Julia is started with [multiple threads](https://docs.julialang.org/en/v1/manual/multi-threading/#man-multithreading). It will throw an warning to remind you when loading `FiniteMPS` with a single thread.
+- Only multi-threading is stable in current version, please make sure Julia is started with [multiple threads](https://docs.julialang.org/en/v1/manual/multi-threading/#man-multithreading). It will throw a warning to remind you when loading `FiniteMPS` with a single thread.
   
   TODO: I will add single-thread mode and try to support multi-processing in the future.
 
@@ -145,8 +145,6 @@ calObs!(Tree, Ψ)
 # collect the results from Tree
 Obs = convert(Dict, Tree, [(:Sz, :Sz), (:Sz,)])
 ```
-> [!WARNING] Warning:
-  DO NOT call `calObs!` twice to a `Tree`, which will lead to a dead loop due to the detailed multi-threading implementation. I will fix this in a future version.
 
 Now you can obtain the spin correlation $\langle S_i^z S_j^z\rangle$ via `Obs.SzSz[(i,j)]` and local moment $\langle S_i^z \rangle$ via `Obs.Sz[(i,)]` (should be zero up to a noise due to the $SU_2$ symmetry of the Heisenberg model).
 

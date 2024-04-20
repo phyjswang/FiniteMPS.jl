@@ -30,6 +30,9 @@ Two rank-`3` operators of hopping `c↑ c↑^dag + c↓ c↓^dag`.
      ΔₛdagΔₛ::NTuple{4, TensorMap}
 Four operators of singlet pairing correlation `Δₛ^dagΔₛ`, where `Δₛ = (c↓c↑ - c↑c↓)/√2`. Rank = `(3, 4, 4, 3)`.
 
+     ΔₜdagΔₜ::NTuple{4, TensorMap}
+Four operators of triplet pairing correlation `Δₜ^dag⋅Δₜ`, where `Δₜ` is the triplet pairing operator that carries `2` charge and `1` spin quantum numbers. Rank = `(3, 4, 4, 3)`.
+
      Δₛ::NTuple{2, TensorMap}
      Δₛdag::NTuple{2, TensorMap}
 Singlet pairing operators `Δₛ` and `Δₛ^dag`. Rank = `(4, 3)`. Note the first operator has nontrivial left bond index.
@@ -101,6 +104,19 @@ const ΔₛdagΔₛ = let
      @tensor B[d a; b e] := A[a b c] * iso[c d e]
      C = permute(B', ((2, 1), (4, 3)))
      D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+
+# triplet pairing correlation
+const ΔₜdagΔₜ = let
+     A = FdagF[1]
+     aspace = Rep[U₁×SU₂]((1, 1 / 2) => 1)
+     aspace2 = Rep[U₁×SU₂]((2, 1) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     # -1 here as Δₜ is anti-symmetric with site indices
+     D = - permute(A', ((2, 1), (3,)))
      A, B, C, D
 end
 
