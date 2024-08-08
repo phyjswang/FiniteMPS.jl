@@ -12,6 +12,9 @@ Generic function to add an N-site interaction via `addIntr1!`, `addIntr2!` and `
      name::NTuple{N,Union{Symbol,String}}
 
 Detailed usage of kwargs see `addIntr1!`, `addIntr2!` and `addIntr4!`.
+
+     Obs::Bool = false
+`Obs == true` means this interaction is used for calculating observables, and thus the `name` and `si` information will be stored in the last node additionally.   
 """
 function addIntr!(Root::InteractionTreeNode,
      Op::NTuple{1,AbstractTensorMap},
@@ -56,7 +59,12 @@ function _update_strength!(node::InteractionTreeNode, strength::Number)
           node.Op.strength = NaN 
      end
      return false
-     
+end
+
+function _update_strength!(node::InteractionTreeNode{T}, strength::Number) where T <: Tuple{String, Vararg{Int64}}
+     # directly update the value when used for calculating observables
+     node.Op.strength = strength
+     return false
 end
 
 function _addZ!(OR::LocalOperator{1, R₂}, Z::AbstractTensorMap) where R₂
@@ -89,6 +97,37 @@ function _addZ!(OR::LocalOperator{2, 2}, Z::AbstractTensorMap)
      end
      return OR
 end
+
+# swap two operators to deal with horizontal bond
+_swap(A::LocalOperator{1, 1}, B::LocalOperator{1, 1}) = B, A
+_swap(A::LocalOperator{1, 1}, B::LocalOperator{1, 2}) = B, A
+_swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 1}) = B, A
+function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
+     return _swapOp(B), _swapOp(A)
+end
+function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
+     #  |      |          |      |
+     #  A--  --B--va -->  B--  --A--va
+     #  |      |          |      |
+
+     @tensor AB[d e; a b f] := A.A[a b c] * B.A[c d e f]     
+     # QR 
+     TA, TB = leftorth(AB)
+     
+     return LocalOperator(permute(TA, (1,), (2, 3)), B.name, B.si, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.strength)
+end
+function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2,1})
+     #     |     |         |     |
+     # va--A-- --B --> va--B-- --A 
+     #     |     |         |     |
+
+     @tensor AB[a e f; b c] := A.A[a b c d] * B.A[d e f]
+     # QR
+     TA, TB = rightorth(AB)
+
+     return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.strength), LocalOperator(permute(TB, (1, 2), (3,)), A.name, A.si, A.strength)
+end
+
 
 
 
