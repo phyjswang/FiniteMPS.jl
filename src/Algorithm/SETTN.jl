@@ -4,7 +4,7 @@
 Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/PhysRevB.95.161104]` method to initialize a high-temperature MPO `ρ = e^(-βH/2)`. Note `ρ` is unnormalized. The list of free energy `F = -lnTr[ρρ^†]/β` with different expansion orders is also returned.
 
 # Kwargs
-     trunc::TruncationScheme = truncbelow(D) (this keyword argument is necessary!) 
+     trunc::TruncationScheme = truncdim(D) (this keyword argument is necessary!) 
      disk::Bool = false
      maxorder::Int64 = 4
      tol::Float64 = 1e-8
@@ -12,7 +12,7 @@ Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/Phy
      compress::Float64 = 1e-16 (finally compress ρ with `tol = compress`)
      ρ₀::MPO (initial MPO, default = Id)
 
-Note we use `mul!` and `axpby!` to implement `H^n -> H^(n+1)` and `ρ -> ρ + (-βH/2)^n / n!`, respectively. All kwargs of these two functions are valid and will be propagated to them appropriately. We find that it is unstable if truncating the bond dimension with `tol`, thus the input keyword argument `trunc` must be a `TruncationDimension` object (`NoTruncation` is also unallowed to avoid infinitely growing bond dimension).
+Note we use `mul!` and `axpby!` to implement `H^n -> H^(n+1)` and `ρ -> ρ + (-βH/2)^n / n!`, respectively. All kwargs of these two functions are valid and will be propagated to them appropriately.
 """
 function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
      @assert β ≥ 0
@@ -21,8 +21,6 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
      verbose::Int64 = get(kwargs, :verbose, 0)
      tol::Float64 = get(kwargs, :tol, 1e-8)
      compress::Float64 = get(kwargs, :compress, 1e-16)
-     trunc::TruncationScheme = get(kwargs, :trunc, truncdim(MPSDefault.D))
-     @assert isa(trunc, TensorKit.TruncationDimension)
 
      # deduce pspace 
      lspspace = map(H) do M
