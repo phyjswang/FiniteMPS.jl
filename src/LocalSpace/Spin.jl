@@ -126,3 +126,92 @@ const Sx = (S₊ + S₋) / 2.
 const Sy = (S₊ - S₋) / (2. * 1im)
 
 end
+
+"""
+    module U₁HardcoreBoson
+
+prepare the local space of U₁ hardcore bosons. Basis convention is `{|1⟩, |0⟩}`.
+
+a⁺ = S₊, a = S₋, n = Sᶻ + 1/2
+
+# Fields
+    pspace::VectorSpace
+Local `d = 2` Hilbert space.
+
+    n::TensorMap
+Rank-`2` particle number operator.
+
+    a⁺a::NTuple{2, TensorMap}
+    aa⁺::NTuple{2, TensorMap}
+Two rank-`3` operators of `a⁺a` and `aa⁺` interaction.
+"""
+module U₁HardcoreBoson
+
+using TensorKit
+
+const pspace = Rep[U₁](-1/2 => 1, 1/2 => 1)
+
+const n = let
+    n = TensorMap(ones, pspace, pspace)
+    block(n, Irrep[U₁](1 // 2)) .= 1
+    block(n, Irrep[U₁](-1 // 2)) .= 0
+    n
+end
+
+const a⁺a = let
+     aspace = Rep[U₁](1 => 1)
+     a⁺ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     a = TensorMap(ones, aspace ⊗ pspace, pspace)
+     a⁺, a
+end
+
+
+const aa⁺ = let
+     aspace = Rep[U₁](1 => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor a[a; c d] := a⁺a[1]'[a, b, c] * iso'[d, b]
+     @tensor a⁺[d a; c] := a⁺a[2]'[a, b, c] * iso[b, d]
+     a, a⁺
+end
+
+end
+
+const U1HardcoreBoson = U₁HardcoreBoson
+
+"""
+    module NoSymHardcoreBoson
+
+prepare the local space of hardcore bosons. Basis convention is `{|0⟩, |1⟩}`.
+
+# Fields
+    pspace::VectorSpace
+Local `d = 2` Hilbert space.
+
+    n::TensorMap
+    a⁺::TensorMap
+    a::TensorMap
+Rank-`2` particle number operator, creation operator, and annihilation operator.
+"""
+
+module NoSymHardcoreBoson
+
+using TensorKit
+
+const pspace = ℂ^2
+
+const n = let
+    mat = Float64[0 0; 0 1]
+    TensorMap(mat, pspace, pspace)
+end
+
+const a⁺ = let
+    mat = Float64[0 1; 0 0]
+    TensorMap(mat, pspace, pspace)
+end
+
+const a = let
+    mat = Float64[0 0; 1 0]
+    TensorMap(mat, pspace, pspace)
+end
+
+end
