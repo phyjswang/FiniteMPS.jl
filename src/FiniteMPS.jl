@@ -74,58 +74,25 @@ include("Environment/connection.jl")
 include("Environment/absorb.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, action, PreFuseProjectiveHamiltonian
+export AbstractProjectiveHamiltonian, SimpleProjectiveHamiltonian, CompositeProjectiveHamiltonian, IdentityProjectiveHamiltonian
+export action!, action
+export SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, PreFuseProjectiveHamiltonian # TODO deprecate in the future
 include("ProjectiveHam/ProjectiveHam.jl")
 include("ProjectiveHam/prefuse.jl")
+include("ProjectiveHam/action.jl")
 include("ProjectiveHam/action2.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action0.jl")
-include("ProjectiveHam/action.jl")
 
-# Algebra operations
-include("Algebra/inner.jl")
-include("Algebra/mul.jl")
-include("Algebra/axpby.jl")
-
-# Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
-export CBEAlgorithm, NoCBE, FullCBE, NaiveCBE, CBE
-include("Algorithm/Lanczos/LanczosGS.jl")
-include("Algorithm/Lanczos/LanczosExp.jl")
-include("Algorithm/Info.jl")
-include("Algorithm/DMRG.jl")
-include("Algorithm/SETTN.jl")
-include("Algorithm/TDVP/TDVP2.jl")
-include("Algorithm/TDVP/TDVP1.jl")
-include("Algorithm/TDVP/Integrator.jl")
-include("Algorithm/CBE/utils.jl")
-include("Algorithm/CBE/OrthComplement.jl")
-# include("Algorithm/CBE/preselect.jl")
-# include("Algorithm/CBE/finalselect.jl")
-# include("Algorithm/CBE/SparseSVD.jl")
-include("Algorithm/CBE/CBEAlgorithm.jl")
-include("Algorithm/CBE/CBE.jl")
-include("Algorithm/CBE/FullCBE.jl")
-include("Algorithm/CBE/NaiveCBE.jl")
-
-
-# Interaction tree for generating Hamiltonian MPO and calculate observables
-# export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr4!, AutomataMPO, AbstractInteractionIterator, OnSiteInteractionIterator, TwoSiteInteractionIterator, ArbitraryInteractionIterator
-# include("IntrTree/Node.jl")
-# include("IntrTree/addIntr.jl")
-# include("IntrTree/addIntr1.jl")
-# include("IntrTree/addIntr2.jl")
-# include("IntrTree/addIntr4.jl")
-# include("IntrTree/Automata.jl")
-export InteractionTree, addIntr!, AutomataMPO
+# Interaction tree for generating Hamiltonian MPO 
+export AbstractInteractionIterator, OnSiteInteractionIterator,TwoSiteInteractionIterator, ArbitraryInteractionIterator, InteractionChannel, InteractionTreeNode, InteractionTree, addIntr!, AutomataMPO
 include("IntrTree/IntrIterator.jl")
 include("IntrTree/IntrTree.jl")
 include("IntrTree/addIntr.jl")
 include("IntrTree/Automata.jl")
 
-
 # Observables
-export ObservableTree, addObs!, calObs!
+export ObservableTree, treewidth, addObs!, calObs!
 include("Observables/ObsTree.jl")
 include("Observables/addObs.jl")
 include("Observables/calObs.jl")
@@ -138,6 +105,30 @@ include("Observables/calITP.jl")
 include("Observables/pushleft.jl")
 include("Observables/pushright.jl")
 include("Observables/convert.jl")
+
+
+# Algebra operations
+include("Algebra/inner.jl")
+include("Algebra/mul.jl")
+include("Algebra/axpby.jl")
+
+# Algorithm
+export LanczosGS, LanczosExp, LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
+export CBEAlgorithm, NoCBE, FullCBE, NaiveCBE, CBE, CBEInfo, LeftOrthComplement, RightOrthComplement
+include("Algorithm/Lanczos/LanczosGS.jl")
+include("Algorithm/Lanczos/LanczosExp.jl")
+include("Algorithm/Info.jl")
+include("Algorithm/DMRG.jl")
+include("Algorithm/SETTN.jl")
+include("Algorithm/TDVP/TDVP2.jl")
+include("Algorithm/TDVP/TDVP1.jl")
+include("Algorithm/TDVP/Integrator.jl")
+include("Algorithm/CBE/utils.jl")
+include("Algorithm/CBE/CBEAlgorithm.jl")
+include("Algorithm/CBE/CBE.jl")
+include("Algorithm/CBE/FullCBE.jl")
+include("Algorithm/CBE/OrthComplement.jl")
+include("Algorithm/CBE/NaiveCBE.jl")
 
 # predefined local spaces
 export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion, U1HardcoreBoson, U₁HardcoreBoson, NoSymHardcoreBoson

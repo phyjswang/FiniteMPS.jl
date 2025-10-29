@@ -1,98 +1,46 @@
 # FiniteMPS.jl
 
+*A julia package for finite MPS/MPO-based computations of ground-state, finite-temperature and dynamical properties.*
+
 ```@meta
 CurrentModule = FiniteMPS
 ```
 
-## Contents
+## Tutorial
 ```@contents
+Pages = ["tutorial/Threading.md",
+"tutorial/Hamiltonian.md",
+"tutorial/Observable.md",
+"tutorial/Heisenberg.md",
+"tutorial/Hubbard.md"
+]
+Depth = 2
 ```
 
-## Types
-### Tensor wrappers
-```@docs
-AbstractTensorWrapper
-AbstractMPSTensor
-MPSTensor
-CompositeMPSTensor
-AdjointMPSTensor
-AbstractEnvironmentTensor 
-LocalLeftTensor
-LocalRightTensor
-SimpleLeftTensor
-SimpleRightTensor
-SparseLeftTensor
-SparseRightTensor
-AbstractLocalOperator
-IdentityOperator
-tag2Tuple
-LocalOperator
-SparseMPOTensor
-AbstractStoreType
-StoreMemory
-StoreDisk
+## [LocalSpace](@id LocalSpace)
+```@contents
+Pages = ["localspace/Spin.md",
+	"localspace/Fermion.md"
+]
+Depth = 2
+```
+## Library
+```@contents
+Pages = ["lib/TensorWrappers.md",
+	"lib/MPS.md",
+	"lib/Environment.md",
+	"lib/ProjHam.md",
+	"lib/IntrTree.md",
+	"lib/ObsTree.md",
+	"lib/ITP.md",
+	"lib/Algebra.md",
+     "lib/Algorithm.md",
+     "lib/Deprecate.md"]
+Depth = 1
 ```
 
-### MPS/MPO
-```@docs
-AbstractMPS
-DenseMPS
-AdjointMPS
-MPS
-MPO
-SparseMPO
-```
-
-### Environment
-```@docs
-AbstractEnvironment
-SimpleEnvironment
-SparseEnvironment
-Environment
-```
-
-### Projective Hamiltonian
-```@docs
-AbstractProjectiveHamiltonian
-IdentityProjectiveHamiltonian
-SparseProjectiveHamiltonian
-```
-
-### Interaction tree
-```@docs
-InteractionTreeNode
-InteractionTree
-addIntr!
-addIntr1!
-addIntr2!
-addIntr4!
-AutomataMPO
-ObservableTree
-addObs!
-```
-
-## Algorithms
-### DMRG
-```@docs
-DMRGInfo
-DMRGSweep2!
-DMRGSweep1!
-```
-
-### TDVP
-```@docs
-TDVPInfo
-TDVPSweep2!
-TDVPSweep1!
-TDVPIntegrator
-SymmetricIntegrator
-```
-
-### CBE
-```@docs
-CBEAlgorithm
-NoCBE
-FullCBE
-StandardCBE
-CBE
+## Index
+```@contents
+Pages = ["index/index.md"]
+Depth = 1
 ```
