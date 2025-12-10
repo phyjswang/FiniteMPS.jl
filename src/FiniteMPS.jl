@@ -114,12 +114,11 @@ include("Algebra/axpby.jl")
 
 # Algorithm
 export LanczosGS, LanczosExp, LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
-export CBEAlgorithm, NoCBE, FullCBE, NaiveCBE, CBE, CBEInfo, LeftOrthComplement, RightOrthComplement
+export CBEAlgorithm, NoCBE, FullCBE, NaiveCBE, CBE, CBEInfo, LeftOrthComplement, RightOrthComplement, ImaginaryTimeStatus, update!, AbstractOptimizer, LinearOptimizer,  ExpLinearOptimizer, AdaptiveWidthOptimizer, AdaptiveGradientOptimizer
 include("Algorithm/Lanczos/LanczosGS.jl")
 include("Algorithm/Lanczos/LanczosExp.jl")
 include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
-include("Algorithm/SETTN.jl")
 include("Algorithm/TDVP/TDVP2.jl")
 include("Algorithm/TDVP/TDVP1.jl")
 include("Algorithm/TDVP/Integrator.jl")
@@ -129,6 +128,8 @@ include("Algorithm/CBE/CBE.jl")
 include("Algorithm/CBE/FullCBE.jl")
 include("Algorithm/CBE/OrthComplement.jl")
 include("Algorithm/CBE/NaiveCBE.jl")
+include("Algorithm/tanTRG/SETTN.jl")
+include("Algorithm/tanTRG/Optimizer.jl")
 
 # predefined local spaces
 export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion

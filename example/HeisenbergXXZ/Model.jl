@@ -49,7 +49,7 @@ function HeisenbergXXZ(Latt::AbstractLattice;
 	# hz 
 	if !iszero(hz)
           @assert LocalSpace ≠ SU₂Spin "hz must be zero in SU2 case!"
-		for i in size(Latt)
+		for i in 1:size(Latt)
                addIntr!(Tree, LocalSpace.Sz, i, -hz; name = :Sz)
 		end
 	end

@@ -8,7 +8,6 @@ include("Model.jl")
 L = 6
 W = 3
 D = 1024
-etol = 1e-8 # tolerance of per site energy
 
 Latt = YCTria(L, W)
 
