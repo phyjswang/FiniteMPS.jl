@@ -82,7 +82,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
 				if direction == :L2R
 					if si < L - 1
 						A_perm = permute(A.A, (Tuple(1:numind(A.A)-1), (numind(A.A),)))
-						De = ceil(Int64, noise[1] * dim(codomain(A_perm)))
+						De = ceil(Int64, noise[1] * dim(domain(A_perm)))
 						Ve = _rsvd_trunc(codomain(A_perm), De)
 						A_noise = randn(eltype(A_perm), codomain(A_perm), Ve)
 						rmul!(A_noise, noise[2] / norm(A_noise))
@@ -97,7 +97,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
 					end
 				elseif si > 1
 					A_perm = permute(A.A, ((1,), Tuple(2:numind(A.A))))
-					De = ceil(Int64, noise[1] * dim(domain(A_perm)))
+					De = ceil(Int64, noise[1] * dim(codomain(A_perm)))
 					Ve = _rsvd_trunc(domain(A_perm), De)
 					A_noise = randn(eltype(A_perm), Ve, domain(A_perm))
 					rmul!(A_noise, noise[2] / norm(A_noise))

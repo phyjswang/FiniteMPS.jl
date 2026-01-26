@@ -199,7 +199,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 					noise = lsnoise[iter]
 					if direction <: SweepL2R
 						x_perm = permute(x.A, (Tuple(1:numind(x.A)-1), (numind(x.A),)))
-						De = ceil(Int64, noise[1] * dim(codomain(x_perm)))
+						De = ceil(Int64, noise[1] * dim(domain(x_perm)))
 						Ve = _rsvd_trunc(codomain(x_perm), De)
 						A_noise = randn(eltype(x_perm), codomain(x_perm), Ve)
 						rmul!(A_noise, noise[2] / norm(A_noise))
@@ -211,7 +211,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 						C[si+1] = catcodomain(Ar, Ar_0)
 					elseif si > 1
 						x_perm = permute(x.A, ((1,), Tuple(2:numind(x.A))))
-						De = ceil(Int64, noise[1] * dim(domain(x_perm)))
+						De = ceil(Int64, noise[1] * dim(codomain(x_perm)))
 						Ve = _rsvd_trunc(domain(x_perm), De)
 
 						A_noise = randn(eltype(x_perm), Ve, domain(x_perm))
