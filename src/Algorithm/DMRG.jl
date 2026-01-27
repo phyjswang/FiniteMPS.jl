@@ -186,6 +186,9 @@ Control the truncation after each update, only used together with CBE. Details s
 
      noise::NTuple{2, Float64} = (0.1, 0.0)
 Add noise to the 1-site local tensor after each Lanczos update via expanding the bond and add a random tensor (normal distribution) to it. The first element is the ratio of additional bond dimension `(≤ 1.0)`, the second element is the noise strength.
+
+     β::Float64 = Inf
+Effective inverse temperature used to mix excited states in Lanczos. 
 """
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
@@ -197,6 +200,8 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      CBEAlg::CBEAlgorithm{SweepL2R} = get(kwargs, :CBEAlg, NoCBE())
      trunc = get(kwargs, :trunc, notrunc())
      noise::NTuple{2, Float64} = get(kwargs, :noise, (0.1, 0.0))
+     β::Float64 = get(kwargs, :β, Inf)
+
      @assert noise[1] ≤ 1.0 && noise[2] ≥ 0.0
 
      TimerSweep = TimerOutput()
@@ -222,7 +227,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
           @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Al, PH, TimerStep;
-               K = K, tol = tol, verbose = false)
+               K = K, tol = tol, verbose = false, β = β)
           finalize(PH)
 
           eg += E₀
@@ -285,6 +290,8 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      CBEAlg::CBEAlgorithm{SweepR2L} = get(kwargs, :CBEAlg, NoCBE())
      trunc = get(kwargs, :trunc, notrunc())
      noise::NTuple{2, Float64} = get(kwargs, :noise, (0.1, 0.0))
+     β::Float64 = get(kwargs, :β, Inf)
+
      @assert noise[1] ≤ 1.0 && noise[2] ≥ 0.0
 
      TimerSweep = TimerOutput()
@@ -310,7 +317,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
           @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Ar, PH, TimerStep;
-               K = K, tol = tol, verbose = false)
+               K = K, tol = tol, verbose = false, β = β)
           finalize(PH)
           eg += E₀
           if si > 1

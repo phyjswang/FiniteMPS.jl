@@ -38,12 +38,18 @@ A in-placed callback function, applied to x after each iteration.
 
 	verbose::Bool = false
 If `true`, print convergence information.
+
+	β::Float64 = Inf
+Effective inverse temperature for mixing excited states. All eigen states are linearly combined with weight `exp(- β ϵ_i)` to form the output state.
 """
 function LanczosGS(f::Function, x₀, args...;
 	K::Int64 = 32,
 	tol::Real = 1e-8,
+	β::Float64 = Inf,
 	callback::Union{Nothing, Function} = nothing,
-     verbose::Bool = false)
+	verbose::Bool = false)
+
+	@assert β > 0
 
 	T = zeros(K + 1, K + 1)  # tridiagonal matrix
 	lsb = Vector{Any}(undef, K + 1) # Lanczos vectors
@@ -51,7 +57,7 @@ function LanczosGS(f::Function, x₀, args...;
 	# first one
 	lsb[1] = normalize!(deepcopy(x₀))
 	Vg = zeros(K)
-     ϵg = fill(NaN, K)
+	ϵg = fill(NaN, K)
 	for k in 1:K
 		# A * bₖ
 		lsb[k+1] = f(lsb[k], args...)
@@ -69,39 +75,57 @@ function LanczosGS(f::Function, x₀, args...;
 		# normalize
 		rmul!(lsb[k+1], 1 / T[k, k+1])
 
-          # callback function here
-          !isnothing(callback) && callback(lsb[k+1])
+		# callback function here
+		!isnothing(callback) && callback(lsb[k+1])
 
 		# convergence check 
 		ϵ, V = eigen(T[1:k, 1:k])
 		if k ≤ 2
-			err2 = Inf 
+			err2 = Inf
 		else
-			err2 = max(norm(V[:, 1] - Vg[1:k])^2, norm(V[end-1:end, 1])^2)
+			err2 = max(norm(V[:, 1] - Vg[1:k])^2, norm(V[(end-1):end, 1])^2)
 		end
 		copyto!(Vg, V[:, 1])
-          ϵg[k] = ϵ[1]
+		ϵg[k] = ϵ[1]
 		if err2 < tol^2 # converged eigen vector
-               verbose && println("eigen vector converged, err2 = $(err2), break at K = $(k)!")
-               break
-          end 
-          # T[k, k+1] = ⟨bₖ|A|bₖ₊₁⟩, scale by the estimated eigval so that A -> a*A give a similar cutoff
+			verbose && println("eigen vector converged, err2 = $(err2), break at K = $(k)!")
+			break
+		end
+		# T[k, k+1] = ⟨bₖ|A|bₖ₊₁⟩, scale by the estimated eigval so that A -> a*A give a similar cutoff
 		ϵmax = maximum(abs, ϵ)
 		if T[k, k+1] ≤ tol * ϵmax # "=" cannot be skipped! 
-               # closed subspace
+			# closed subspace
 			verbose && println("T[$k, $(k+1)]/max|ϵ| = $(T[k, k+1]/ϵmax), break at K = $(k)!")
 			break
 		end
 	end
-	
-     # linear combination
-	xg = rmul!(lsb[1], Vg[1])
-     K_cut = findlast(!isnan, ϵg)
-	for k in 2:K_cut
-		add!(xg, lsb[k], Vg[k])
+
+	# linear combination
+	K_cut = findlast(!isnan, ϵg)
+	if isinf(β)
+		xg = rmul!(lsb[1], Vg[1])
+		for k in 2:K_cut
+			add!(xg, lsb[k], Vg[k])
+		end
+		ϵx = ϵg[K_cut]
+	else
+		# weighted by e^{- β ϵ_i}
+		ϵ, V = eigen(T[1:K_cut, 1:K_cut])
+		coefs = sum(1:K_cut) do j 
+			exp(-β * (ϵ[j] - ϵ[1])) * V[:, j]
+		end
+		coefs = coefs / norm(coefs)
+
+		xg = rmul!(lsb[1], coefs[1])
+		for k in 2:K_cut
+			add!(xg, lsb[k], coefs[k])
+		end
+		normalize!(xg)
+
+		ϵx = coefs' * T[1:K_cut, 1:K_cut] * coefs
 	end
 
 	info = (V = Vg[1:K_cut], ϵ = ϵg[1:K_cut], T = T[1:K_cut, 1:K_cut])
 
-     return ϵg[K_cut], xg, info
+	return ϵx, xg, info
 end

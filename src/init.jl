@@ -13,6 +13,9 @@ function __init__()
 
      # setup TensorKit caches
      TensorKit.DEFAULT_GLOBALCACHE_SIZE[] = 10^3
+     for c in TensorKit.GLOBAL_CACHES 
+          c[2].maxsize = TensorKit.DEFAULT_GLOBALCACHE_SIZE[]
+     end
 
      return nothing
 end
